@@ -1,4 +1,4 @@
 **/*.ipynb_checkpoints/
-**/*.swo
-**/*.swp
-**/*.dat
+**/*.swo/
+**/*.swp/
+**/*.dat/
