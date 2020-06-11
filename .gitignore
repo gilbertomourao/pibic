@@ -27,3 +27,4 @@ tags
 ############################
 
 *.dat
+**/*.ipynb_checkpoints/

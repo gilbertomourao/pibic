@@ -8,8 +8,8 @@ import numpy as np
 from hough import houghOverlay
 
 # loading the overlay
-hw = houghOverlay('xfhough100.bit')
-hw.loadParameters(edges_lthr = 20, edges_hthr = 50, lines_thr = 80)
+hw = houghOverlay('houghlines.bit')
+hw.loadParameters(edges_lthr = 20, edges_hthr = 30, lines_thr = 80, gap_size = 5, min_length = 50)
 
 camera = 0
 iterations = 10
@@ -23,7 +23,7 @@ fps = FPS().start()
 
 while fps._numFrames < iterations:
     hw.frame[:] = vs.read()
-    [rho, theta] = hw.HoughLines()
+    [lines, segments] = hw.HoughLines()
     fps.update()
 
 fps.stop()
@@ -36,8 +36,9 @@ print('Software execution...')
 def sw_houghlines(sw_frame):
     gray = cv2.cvtColor(sw_frame, cv2.COLOR_BGR2GRAY)
     blur = cv2.blur(gray,(3,3))
-    edges = cv2.Canny(blur, 20, 50, apertureSize=3)
+    edges = cv2.Canny(blur, 20, 30, apertureSize=3)
     lines = cv2.HoughLines(edges,1,np.pi/180,80)
+    segments = cv2.HoughLinesP(edges,1,np.pi/180,80,50,5)
     return lines
 
 fps = FPS().start()

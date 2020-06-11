@@ -33,11 +33,16 @@ class houghOverlay(Overlay):
     # M_AXI offset
     __OUTRHO_ADDR = 0x10
     __OUTTHETA_ADDR = 0x18
+    __NUM_OF_LINES_ADDR = 0x20
+    __LINES_SEGMENTS_ADDR = 0x28
+    __NUM_OF_SEGMENTS_ADDR = 0x30
 
     # S_AXILITE offset
-    __EDGES_LTHR_ADDR = 0x20
-    __EDGES_HTHR_ADDR = 0x28
-    __LINES_THR_ADDR = 0x30
+    __EDGES_LTHR_ADDR = 0x38
+    __EDGES_HTHR_ADDR = 0x40
+    __LINES_THR_ADDR = 0x48
+    __GAP_SIZE_ADDR = 0x50
+    __MIN_LENGTH_ADDR = 0x58
 
     def __init__(self, bitfile, **kwargs):
         """
@@ -61,6 +66,9 @@ class houghOverlay(Overlay):
         self.__ap_ctrl = Register(base_addr, 32)
         self.__outrho_offset = Register(base_addr + self.__OUTRHO_ADDR, 32)
         self.__outtheta_offset = Register(base_addr + self.__OUTTHETA_ADDR, 32)
+        self.__num_of_lines_offset = Register(base_addr + self.__NUM_OF_LINES_ADDR, 32)
+        self.__segments_offset = Register(base_addr + self.__LINES_SEGMENTS_ADDR, 32)
+        self.__num_of_segments_offset = Register(base_addr + self.__NUM_OF_SEGMENTS_ADDR, 32)
 
         # DMA transfer engine
         self.__xlnk = Xlnk()
@@ -68,22 +76,29 @@ class houghOverlay(Overlay):
         # Memory pre-allocation
         self.__cma_rho = self.__xlnk.cma_array(self.__LINES, np.single)
         self.__cma_theta = self.__xlnk.cma_array(self.__LINES, np.single)
+        self.__cma_numoflines = self.__xlnk.cma_array(1, np.int)
+        self.__cma_segments = self.__xlnk.cma_array((self.__LINES, 4), np.int)
+        self.__cma_numofsegments = self.__xlnk.cma_array(1, np.int)
+
         self.__cmabuf_dest = self.__xlnk.cma_array((self.__HEIGHT, self.__WIDTH, 3), np.uint8)
+        
         # public
         self.frame = self.__xlnk.cma_array((self.__HEIGHT, self.__WIDTH, 3), np.uint8)
 
-        # Numpy arrays
-        self.__rho = np.zeros(self.__LINES, dtype = np.single)
-        self.__theta = np.zeros(self.__LINES, dtype = np.single)
-
-        # Write address of _rho and _theta to HLS core
+        # Write address of M_AXI to HLS core
         self.__outrho_offset[31:0] = self.__xlnk.cma_get_phy_addr(self.__cma_rho.pointer)
         self.__outtheta_offset[31:0] = self.__xlnk.cma_get_phy_addr(self.__cma_theta.pointer)
+        self.__num_of_lines_offset[31:0] = self.__xlnk.cma_get_phy_addr(self.__cma_numoflines.pointer)
+        self.__segments_offset[31:0] = self.__xlnk.cma_get_phy_addr(self.__cma_segments.pointer)
+        self.__num_of_segments_offset[31:0] = self.__xlnk.cma_get_phy_addr(self.__cma_numofsegments.pointer)
 
     def __del__(self):
         self.__cmabuf_dest.freebuffer()
         self.__cma_rho.freebuffer()
         self.__cma_theta.freebuffer()
+        self.__cma_numoflines.freebuffer()
+        self.__cma_segments.freebuffer()
+        self.__cma_numofsegments.freebuffer()
         self.frame.freebuffer()
 
     def __start(self):
@@ -121,17 +136,21 @@ class houghOverlay(Overlay):
         edges_lthr = kwargs.get('edges_lthr')
         edges_hthr = kwargs.get('edges_hthr')
         lines_thr = kwargs.get('lines_thr')
+        gap_size = kwargs.get('gap_size')
+        min_length = kwargs.get('min_length')
 
         self.__hough.write(self.__EDGES_LTHR_ADDR, edges_lthr)
         self.__hough.write(self.__EDGES_HTHR_ADDR, edges_hthr)
         self.__hough.write(self.__LINES_THR_ADDR, lines_thr)
+        self.__hough.write(self.__GAP_SIZE_ADDR, gap_size)
+        self.__hough.write(self.__MIN_LENGTH_ADDR, min_length)
 
     def HoughLines(self, canny = None):
         """
         Launch computation on the HLS core
         """
         # To check when the computation will finish
-        self.__cma_rho[self.__LINES-1] = -1 # impossible to have rho < 0
+        self.__cma_numofsegments[0] = -1 # impossible to have numofsegments < 0
 
         # FPGA --> ARM
         self.__dma.recvchannel.transfer(self.__cmabuf_dest)
@@ -147,18 +166,28 @@ class houghOverlay(Overlay):
         self.__dma.recvchannel.wait()
         
         # delay to wait for the m_axi output
-        #time.sleep(1e-3)
-        while(self.__cma_rho[self.__LINES-1] == -1):
+        #time.sleep(3e-3)
+        while(self.__cma_numofsegments[0] == -1):
             continue
 
         # Lower the AP_START bit of the AP_CTRL to terminate computation
         self.__stop()
 
-        self.__rho[:] = self.__cma_rho[:]
-        self.__theta[:] = self.__cma_theta[:]
+        # Return the values as numpy arrays
+        n_lines = self.__cma_numoflines[0]
+        n_segments = self.__cma_numofsegments[0]
+
+        lines = np.zeros((n_lines,2), dtype = np.single)
+        segments = np.zeros((n_segments,4), dtype = np.int)
+
+        lines[:,0] = self.__cma_rho[0:n_lines]
+        lines[:,1] = self.__cma_theta[0:n_lines]
+
+        segments = self.__cma_segments[0:n_segments][:]
+
         if (type(canny) is np.ndarray and canny.shape == (self.__HEIGHT, self.__WIDTH, 3) and canny.dtype == np.uint8):
             canny[:] = self.__cmabuf_dest[:]
 
-        return [self.__rho, self.__theta]
+        return [lines, segments]
 
 # end of HoughDrive    
