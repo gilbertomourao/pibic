@@ -7,16 +7,17 @@ import math
 import time
 
 # Loading the overlay
-hw = houghOverlay('houghlines.bit')
+hw = houghOverlay('hwvhough.bit')
 hw.loadParameters(edges_lthr = 20, edges_hthr = 30, lines_thr = 80, gap_size = 5, min_length = 50)
 
 # Extracting lines
 img_path = r'/home/xilinx/jupyter_notebooks/temp/data/usar'
-canto = img_path + '/canto.jpg'
-janela = img_path + '/janela.jpg'
-porta = img_path + '/porta.jpg'
-tv = img_path + '/tv.jpg'
-chao = img_path + '/chao.jpg'
+canto = img_path + '/canto.png'
+janela = img_path + '/janela.png'
+porta = img_path + '/porta.png'
+tv = img_path + '/tv.png'
+chao = img_path + '/chao.png'
+quarto = img_path + '/quarto.png'
 
 # pre-allocation
 edges = np.zeros((480,640,3), np.uint8)
@@ -85,11 +86,11 @@ def software_test(image):
 
 hardware_test(canto)
 
-cv2.imwrite('resultados/canto/edges_canto.jpg', edges_temp)
-cv2.imwrite('resultados/canto/lines_canto.jpg', edges)
-cv2.imwrite('resultados/canto/lines_canto_original.jpg', original)
-cv2.imwrite('resultados/canto/segments_canto.jpg', edges2)
-cv2.imwrite('resultados/canto/segments_canto_original.jpg', original2)
+cv2.imwrite('resultados/canto/edges_canto.png', edges_temp)
+cv2.imwrite('resultados/canto/lines_canto.png', edges)
+cv2.imwrite('resultados/canto/lines_canto_original.png', original)
+cv2.imwrite('resultados/canto/segments_canto.png', edges2)
+cv2.imwrite('resultados/canto/segments_canto_original.png', original2)
 
 
 #software time analyzer
@@ -102,11 +103,11 @@ software_test(canto)
 
 hardware_test(janela)
 
-cv2.imwrite('resultados/janela/edges_janela.jpg', edges_temp)
-cv2.imwrite('resultados/janela/lines_janela.jpg', edges)
-cv2.imwrite('resultados/janela/lines_janela_original.jpg', original)
-cv2.imwrite('resultados/janela/segments_janela.jpg', edges2)
-cv2.imwrite('resultados/janela/segments_janela_original.jpg', original2)
+cv2.imwrite('resultados/janela/edges_janela.png', edges_temp)
+cv2.imwrite('resultados/janela/lines_janela.png', edges)
+cv2.imwrite('resultados/janela/lines_janela_original.png', original)
+cv2.imwrite('resultados/janela/segments_janela.png', edges2)
+cv2.imwrite('resultados/janela/segments_janela_original.png', original2)
 
 #software time analyzer
 
@@ -118,11 +119,11 @@ software_test(janela)
 
 hardware_test(porta)
 
-cv2.imwrite('resultados/porta/edges_porta.jpg', edges_temp)
-cv2.imwrite('resultados/porta/lines_porta.jpg', edges)
-cv2.imwrite('resultados/porta/lines_porta_original.jpg', original)
-cv2.imwrite('resultados/porta/segments_porta.jpg', edges2)
-cv2.imwrite('resultados/porta/segments_porta_original.jpg', original2)
+cv2.imwrite('resultados/porta/edges_porta.png', edges_temp)
+cv2.imwrite('resultados/porta/lines_porta.png', edges)
+cv2.imwrite('resultados/porta/lines_porta_original.png', original)
+cv2.imwrite('resultados/porta/segments_porta.png', edges2)
+cv2.imwrite('resultados/porta/segments_porta_original.png', original2)
 
 #software time analyzer
 
@@ -134,30 +135,47 @@ software_test(porta)
 
 hardware_test(tv)
 
-cv2.imwrite('resultados/tv/edges_tv.jpg', edges_temp)
-cv2.imwrite('resultados/tv/lines_tv.jpg', edges)
-cv2.imwrite('resultados/tv/lines_tv_original.jpg', original)
-cv2.imwrite('resultados/tv/segments_tv.jpg', edges2)
-cv2.imwrite('resultados/tv/segments_tv_original.jpg', original2)
+cv2.imwrite('resultados/tv/edges_tv.png', edges_temp)
+cv2.imwrite('resultados/tv/lines_tv.png', edges)
+cv2.imwrite('resultados/tv/lines_tv_original.png', original)
+cv2.imwrite('resultados/tv/segments_tv.png', edges2)
+cv2.imwrite('resultados/tv/segments_tv_original.png', original2)
 
 #software time analyzer
 
 software_test(tv)
 
 #########################################
-################ CHAO ###################
+################ Chao ###################
 #########################################
 
 hardware_test(chao)
 
-cv2.imwrite('resultados/chao/edges_chao.jpg', edges_temp)
-cv2.imwrite('resultados/chao/lines_chao.jpg', edges)
-cv2.imwrite('resultados/chao/lines_chao_original.jpg', original)
-cv2.imwrite('resultados/chao/segments_chao.jpg', edges2)
-cv2.imwrite('resultados/chao/segments_chao_original.jpg', original2)
+cv2.imwrite('resultados/chao/edges_chao.png', edges_temp)
+cv2.imwrite('resultados/chao/lines_chao.png', edges)
+cv2.imwrite('resultados/chao/lines_chao_original.png', original)
+cv2.imwrite('resultados/chao/segments_chao.png', edges2)
+cv2.imwrite('resultados/chao/segments_chao_original.png', original2)
 
 #software time analyzer
 
 software_test(chao)
+
+#########################################
+############## Quarto ###################
+#########################################
+
+hardware_test(quarto)
+
+cv2.imwrite('resultados/quarto/edges_quarto.png', edges_temp)
+cv2.imwrite('resultados/quarto/lines_quarto.png', edges)
+cv2.imwrite('resultados/quarto/lines_quarto_original.png', original)
+cv2.imwrite('resultados/quarto/segments_quarto.png', edges2)
+cv2.imwrite('resultados/quarto/segments_quarto_original.png', original2)
+
+
+#software time analyzer
+
+software_test(quarto)
 
 

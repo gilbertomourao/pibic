@@ -26,11 +26,13 @@ class FPS:
         return self._numFrames / self.elapsed()
 
 class WebcamVideoStream:
-    def __init__(self,src=0):
+    def __init__(self,data,src=0):
+        self.frame = data
         self.stream = cv2.VideoCapture(src)
+        self.stream.set(cv2.CAP_PROP_FPS, 100)
         self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        (self.grabbed, self.frame) = self.stream.read()
+        (self.grabbed, self.frame[:]) = self.stream.read()
 
         self.stopped = False
 
@@ -42,7 +44,7 @@ class WebcamVideoStream:
         while True:
             if self.stopped:
                 return
-            (self.grabbed, self.frame) = self.stream.read()
+            (self.grabbed, self.frame[:]) = self.stream.read()
 
     def read(self):
         return self.frame

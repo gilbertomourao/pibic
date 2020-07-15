@@ -5,7 +5,7 @@
 #include "top.h"
 #include <hls_opencv.h>
 
-#define IMAGE_PATH "C:/Users/chico/Documents/HLS/Zedboard/test_hough/data_casa/usar/janela.jpg"
+#define IMAGE_PATH "C:/Users/chico/Documents/HLS/Zedboard/test_hough/data_casa/usar/teste1.jpg"
 
 void draw_lines(float *outrho, float *outtheta, int *num_of_lines, cv::Mat &edge_img, cv::Mat &orig_img)
 {
@@ -63,7 +63,18 @@ int main()
 	int gap_size = 5;
 	int min_length = 50;
 
-	hough_accel(img_in.data, img_edges.data, outrho, outtheta, num_of_lines, segments, num_of_segments, edges_lthr, edges_hthr, lines_thr, gap_size, min_length);
+	hough_accel(img_in.data, img_edges.data,
+			outrho, outtheta, num_of_lines,
+			segments, num_of_segments,
+			edges_lthr, edges_hthr, lines_thr,
+			gap_size, min_length);
+
+	/*
+	for (int r = 0; r < MAX_LINES; r++)
+	{
+		printf("[%f, %f]\n", outrho[r], outtheta[r]);
+	}
+	*/
 
 	printf("Number of detected lines: %d\n", num_of_lines[0]);
 	printf("Number of detected segments: %d\n", num_of_segments[0]);

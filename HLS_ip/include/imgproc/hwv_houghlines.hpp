@@ -200,7 +200,7 @@ static void __Voting(Matrix<SRC_T, ROWS, COLS> &src_img, ap_uint<12> accum[Angle
 			img_pixel_val = src_img.read(i,j); // Reading one pixel at a time (address auto incremented) in raster scan order
 			j_eq_width = ( j == (COLS-1) ) ? 1:0;
 			j_eq_0 = ( j == 0)? 1:0;
-			edges_mem[i][j] = img_pixel_val; // stores the lsb on the BRAM that contains the edges matrix
+			edges_mem[i][j] = img_pixel_val; // stores the lsb on the RAM that contains the edges matrix
 
 			LOOPN1:for(ap_uint<10> n = 0; n < (AngleN); n++ ) // angle loop
 			{
@@ -520,9 +520,11 @@ static void LinesKernel(Matrix<_SRC_T, _HEIGHT, _WIDTH> &src_img, Polar<_RHO_T, 
 
 static void CountLines(Polar<_RHO_T, _THETA_T, _linesMax, SIZE_T> &lines)
 {
+//#pragma HLS INLINE OFF
+
 	lines.size = lines.rho[0] != 0 || lines.theta[0] != 0;
 
-	for (int i = 0; i < _linesMax; i++)
+	for (int i = 1; i < _linesMax; i++)
 	{
 #pragma HLS PIPELINE
 		bool flag1 = lines.rho[i] != lines.rho[i-1],

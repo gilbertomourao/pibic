@@ -8,8 +8,8 @@ class houghOverlay(Overlay):
     """
     This overlay constains the inferface to the PL
     image processing filter. It extracts the edges
-    of the image and the lines polar parameters as
-    well. The image size is 640x480. 
+    of the image, the lines polar parameters and the
+    lines segments as well. The image size is 640x480. 
     """
 
     __HEIGHT = 480
@@ -135,12 +135,14 @@ class houghOverlay(Overlay):
         """
         edges_lthr = kwargs.get('edges_lthr')
         edges_hthr = kwargs.get('edges_hthr')
+       
         lines_thr = kwargs.get('lines_thr')
         gap_size = kwargs.get('gap_size')
         min_length = kwargs.get('min_length')
 
         self.__hough.write(self.__EDGES_LTHR_ADDR, edges_lthr)
         self.__hough.write(self.__EDGES_HTHR_ADDR, edges_hthr)
+        
         self.__hough.write(self.__LINES_THR_ADDR, lines_thr)
         self.__hough.write(self.__GAP_SIZE_ADDR, gap_size)
         self.__hough.write(self.__MIN_LENGTH_ADDR, min_length)

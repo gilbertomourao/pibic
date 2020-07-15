@@ -33,8 +33,8 @@ void stream2Mat(axi_dma_stream<bits> *src, Matrix<SRC_T, HEIGHT, WIDTH> &dst)
 	{
 		for (int x = 0; x < WIDTH; x++)
 		{
-#pragma HLS PIPELINE II=1
-#pragma HLS LOOP_FLATTEN OFF
+//#pragma HLS PIPELINE II=1
+//#pragma HLS LOOP_FLATTEN OFF
 
 			dst.write(y, x, src[x + y*WIDTH].data);
 		}
