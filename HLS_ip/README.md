@@ -4,4 +4,4 @@ The hough_accel ip core was generated using Vivado HLS v2019.1. The target devic
 
 ## Report
 
-![report](vivado_hls_report.png)
+![report](vivado_hls_report.PNG)
