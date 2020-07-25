@@ -2,7 +2,7 @@ from pynq import Overlay, GPIO, Register, Xlnk
 import os
 import inspect
 import numpy as np
-import time
+import cv2
 
 class houghOverlay(Overlay):
     """
@@ -15,6 +15,7 @@ class houghOverlay(Overlay):
     __HEIGHT = 480
     __WIDTH = 640
     __LINES = 100
+    __SEGMENTS = 200
 
     __RESET_VALUE = 0
     __NRESET_VALUE = 1
@@ -76,9 +77,9 @@ class houghOverlay(Overlay):
         # Memory pre-allocation
         self.__cma_rho = self.__xlnk.cma_array(self.__LINES, np.single)
         self.__cma_theta = self.__xlnk.cma_array(self.__LINES, np.single)
-        self.__cma_numoflines = self.__xlnk.cma_array(1, np.int)
-        self.__cma_segments = self.__xlnk.cma_array((self.__LINES, 4), np.int)
-        self.__cma_numofsegments = self.__xlnk.cma_array(1, np.int)
+        self.__cma_numoflines = self.__xlnk.cma_array(1, np.int32)
+        self.__cma_segments = self.__xlnk.cma_array((self.__SEGMENTS, 4), np.int32)
+        self.__cma_numofsegments = self.__xlnk.cma_array(1, np.int32)
 
         self.__cmabuf_dest = self.__xlnk.cma_array((self.__HEIGHT, self.__WIDTH, 3), np.uint8)
         
@@ -91,6 +92,12 @@ class houghOverlay(Overlay):
         self.__num_of_lines_offset[31:0] = self.__xlnk.cma_get_phy_addr(self.__cma_numoflines.pointer)
         self.__segments_offset[31:0] = self.__xlnk.cma_get_phy_addr(self.__cma_segments.pointer)
         self.__num_of_segments_offset[31:0] = self.__xlnk.cma_get_phy_addr(self.__cma_numofsegments.pointer)
+
+        # Performs the computation for the first time to avoid bad behavior on the first call.
+        # For a small number of segments, maybe only 6 segments will be detected if we don't
+        # call the HoughLines function for the first time here.
+        self.frame[:] = cv2.imread(dir_path+'/star.png')
+        self.HoughLines(20,30,80,5,50)
 
     def __del__(self):
         self.__cmabuf_dest.freebuffer()
@@ -129,7 +136,7 @@ class houghOverlay(Overlay):
         """
         self.__resetPin.write(self.__RESET_VALUE)
 
-    def loadParameters(self, **kwargs):
+    def __loadParameters(self, **kwargs):
         """
         Load the Hough overlay coefficients into the HLS core
         """
@@ -147,10 +154,12 @@ class houghOverlay(Overlay):
         self.__hough.write(self.__GAP_SIZE_ADDR, gap_size)
         self.__hough.write(self.__MIN_LENGTH_ADDR, min_length)
 
-    def HoughLines(self, canny = None):
+    def HoughLines(self, ed_lthr, ed_hthr, thr, gap, minL, canny = None):
         """
         Launch computation on the HLS core
         """
+        self.__loadParameters(edges_lthr = ed_lthr, edges_hthr = ed_hthr, lines_thr = thr, gap_size = gap, min_length = minL)
+
         # To check when the computation will finish
         self.__cma_numofsegments[0] = -1 # impossible to have numofsegments < 0
 
@@ -166,9 +175,8 @@ class houghOverlay(Overlay):
         # Wait for the DMA engines to finish
         self.__dma.sendchannel.wait()
         self.__dma.recvchannel.wait()
-        
+
         # delay to wait for the m_axi output
-        #time.sleep(3e-3)
         while(self.__cma_numofsegments[0] == -1):
             continue
 
@@ -180,7 +188,7 @@ class houghOverlay(Overlay):
         n_segments = self.__cma_numofsegments[0]
 
         lines = np.zeros((n_lines,2), dtype = np.single)
-        segments = np.zeros((n_segments,4), dtype = np.int)
+        segments = np.zeros((n_segments,4), dtype = np.int32)
 
         lines[:,0] = self.__cma_rho[0:n_lines]
         lines[:,1] = self.__cma_theta[0:n_lines]

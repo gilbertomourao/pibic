@@ -5,7 +5,7 @@
 #include "top.h"
 #include <hls_opencv.h>
 
-#define IMAGE_PATH "C:/Users/chico/Documents/HLS/Zedboard/test_hough/data_casa/usar/teste1.jpg"
+#define IMAGE_PATH "C:/Users/chico/Documents/HLS/Zedboard/test_hough/data/usar/star.png"
 
 void draw_lines(float *outrho, float *outtheta, int *num_of_lines, cv::Mat &edge_img, cv::Mat &orig_img)
 {

@@ -10,8 +10,8 @@ import time
 
 # loading the overlay
 hw = houghOverlay('hwvhough.bit')
-hw.loadParameters(edges_lthr = 20, edges_hthr = 30, lines_thr = 80, gap_size = 5, min_length = 50)
 
+# Some parameters to perform the simulation
 camera = 0
 iterations = 100
 
@@ -24,7 +24,7 @@ fps = FPS().start()
 
 while fps._numFrames < iterations:
     #hw.frame[:] = vs.read()
-    [lines, segments] = hw.HoughLines()
+    [lines, segments] = hw.HoughLines(20,30,80,5,50)
     #time.sleep(6e-3)
     fps.update()
 
