@@ -6,7 +6,7 @@ import cv2
 
 class houghOverlay(Overlay):
     """
-    This overlay constains the inferface to the PL
+    This overlay contains the inferface to the PL
     image processing filter. It extracts the edges
     of the image, the lines polar parameters and the
     lines segments as well. The image size is 640x480. 
@@ -94,10 +94,10 @@ class houghOverlay(Overlay):
         self.__num_of_segments_offset[31:0] = self.__xlnk.cma_get_phy_addr(self.__cma_numofsegments.pointer)
 
         # Performs the computation for the first time to avoid bad behavior on the first call.
-        # For a small number of segments, maybe only 6 segments will be detected if we don't
+        # For a small number of segments, maybe not all segments will be detected if we don't
         # call the HoughLines function for the first time here.
         self.frame[:] = cv2.imread(dir_path+'/star.png')
-        self.HoughLines(20,30,80,5,50)
+        self.HoughLines(20,30,80,5,30)
 
     def __del__(self):
         self.__cmabuf_dest.freebuffer()

@@ -5,7 +5,7 @@
 #include "top.h"
 #include <hls_opencv.h>
 
-#define IMAGE_PATH "C:/Users/chico/Documents/HLS/Zedboard/test_hough/data/usar/star.png"
+#define IMAGE_PATH "C:/Users/chico/Documents/HLS/Zedboard/test_hough/data/usar/porta.png"
 
 void draw_lines(float *outrho, float *outtheta, int *num_of_lines, cv::Mat &edge_img, cv::Mat &orig_img)
 {
@@ -61,7 +61,7 @@ int main()
 	int edges_hthr = 30;
 	int lines_thr = 80;
 	int gap_size = 5;
-	int min_length = 50;
+	int min_length = 30;
 
 	hough_accel(img_in.data, img_edges.data,
 			outrho, outtheta, num_of_lines,

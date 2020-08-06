@@ -699,6 +699,8 @@ static void ExtractSegments(short gap_size, short min_length, ap_uint<1> edges_m
 template<unsigned int rho, unsigned int theta, class SRC_T, int HEIGHT, int WIDTH, class RHO_T, class THETA_T, unsigned int linesMax, class SIZE_T, class COORD_T, unsigned int segmentsMax>
 void HoughLines(Matrix<SRC_T, HEIGHT, WIDTH> &src_img, Polar<RHO_T, THETA_T, linesMax, SIZE_T> &lines, Cartesian<COORD_T, segmentsMax, SIZE_T> &segments, short threshold, short gap_size, short min_length)
 {
+#pragma HLS INLINE OFF
+	
 	// opencv videoCapture resolutions for logitech webcam c270
 	assert( ( (HEIGHT == 120 && WIDTH == 160) || 
 		      (HEIGHT == 144 && WIDTH == 176) || 

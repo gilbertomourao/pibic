@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
-from __future__ import print_function
+#from __future__ import print_function
 from webcam import WebcamVideoStream, FPS
-import argparse
+#import argparse
 import cv2
 import numpy as np
 from hough import houghOverlay
 import time
 
-# loading the overlay
-hw = houghOverlay('hwvhough.bit')
+# loading the Overlay
+hw = houghOverlay('hwvhough2.bit')
 
 # Some parameters to perform the simulation
 camera = 0
@@ -24,7 +24,7 @@ fps = FPS().start()
 
 while fps._numFrames < iterations:
     #hw.frame[:] = vs.read()
-    [lines, segments] = hw.HoughLines(20,30,80,5,50)
+    [lines, segments] = hw.HoughLines(20,30,80,5,30)
     #time.sleep(6e-3)
     fps.update()
 
@@ -46,7 +46,7 @@ def sw_houghlines(sw_frame):
     blur = cv2.blur(gray,(3,3))
     edges = cv2.Canny(blur, 20, 30, apertureSize=3)
     lines = cv2.HoughLines(edges,1,np.pi/90,80)
-    segments = cv2.HoughLinesP(edges,1,np.pi/90,80,50,5)
+    segments = cv2.HoughLinesP(edges,1,np.pi/90,80,30,5)
     return [lines, segments]
 
 # DIP loop pipeline

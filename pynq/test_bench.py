@@ -7,7 +7,7 @@ import math
 import time
 
 # Loading the overlay
-hw = houghOverlay('hwvhough.bit')
+hw = houghOverlay('hwvhough2.bit')
 
 # Extracting lines
 img_path = r'/home/xilinx/jupyter_notebooks/temp/data/usar'
@@ -51,7 +51,7 @@ def hardware_test(image):
     hw.frame[:] = cv2.imread(image)
     original[:] = hw.frame[:]
     start = time.time()
-    [lines, segments] = hw.HoughLines(20, 30, 80, 5, 50, canny = edges)
+    [lines, segments] = hw.HoughLines(20, 30, 80, 5, 30, canny = edges)
     end = time.time()
 
     print('Elapsed time (in ms): ',str((end - start)*1e3))
@@ -79,6 +79,22 @@ def software_test(image):
 
 
 if __name__ == "__main__":
+ 
+    #########################################
+    ############## Canto ####################
+    #########################################
+
+    hardware_test(canto)
+
+    cv2.imwrite('resultados/canto/edges_canto.png', edges_temp)
+    cv2.imwrite('resultados/canto/lines_canto.png', edges)
+    cv2.imwrite('resultados/canto/lines_canto_original.png', original)
+    cv2.imwrite('resultados/canto/segments_canto.png', edges2)
+    cv2.imwrite('resultados/canto/segments_canto_original.png', original2)
+
+    #software time analyzer
+
+    software_test(canto)
 
     #########################################
     ############## Janela ###################
@@ -95,22 +111,6 @@ if __name__ == "__main__":
     #software time analyzer
 
     software_test(janela)
-
-    #########################################
-    ############## Canto ####################
-    #########################################
-
-    hardware_test(canto)
-
-    cv2.imwrite('resultados/canto/edges_canto.png', edges_temp)
-    cv2.imwrite('resultados/canto/lines_canto.png', edges)
-    cv2.imwrite('resultados/canto/lines_canto_original.png', original)
-    cv2.imwrite('resultados/canto/segments_canto.png', edges2)
-    cv2.imwrite('resultados/canto/segments_canto_original.png', original2)
-
-    #software time analyzer
-
-    software_test(canto)
 
     #########################################
     ############## Porta ####################

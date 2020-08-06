@@ -28,10 +28,10 @@ void Color2Gray(Matrix<SRC_T, HEIGHT, WIDTH> &src, Matrix<DST_T, HEIGHT, WIDTH> 
 			int pix_gray;
 			ap_uint<24> dat = src.read(y, x);
 
-			#pragma HLS RESOURCE variable=pix_gray core=AddSub
+#pragma HLS RESOURCE variable=pix_gray core=AddSub
 
-			// Y = B*0.144 + G*0.587 + R*0.299
-			pix_gray = 9437 * (dat & 0x0000ff)
+			// Y = B*0.114 + G*0.587 + R*0.299
+			pix_gray = 7471 * (dat & 0x0000ff)
 					 + 38469 * ( (dat & 0x00ff00) >> 8 )
 					 + 19595 * ( (dat & 0xff0000) >> 16 );
 
